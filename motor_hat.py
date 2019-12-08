@@ -23,12 +23,20 @@ except ImportError:
     log.error("Ctrl-C to quit")
     motorsEnabled = False
 
+try:
+    import RPi.GPIO as GPIO
+    camServoEnabled = True
+except ImportError:
+    log.critical("Problem with RPi.GPIO")
+    camServoEnabled = False
+
 # todo: specificity is not correct, this is specific to a bot with a claw, not all motor_hat based bots
 #from Adafruit_PWM_Servo_Driver import PWM
 
 mh = None
 motorA = None
 motorB = None
+p = None
 turningSpeedActuallyUsed = None
 dayTimeDrivingSpeedActuallyUsed = None
 nightTimeDrivingSpeedActuallyUsed = None
@@ -41,16 +49,23 @@ chargeIONumber = None
 
 forward = None
 backward = None
+left_rotate = None
+right_rotate = None
 left = None
 right = None
 
 straightDelay = None
 turnDelay = None
+sideDelay = None
 
 
 servoMin = [150, 150, 130]  # Min pulse length out of 4096
 servoMax = [600, 600, 270]  # Max pulse length out of 4096
 armServo = [300, 300, 300]
+
+camServoMin = 6.0
+camServoMax = 11.5
+camServo = 8.0
 
 def setSpeedBasedOnCharge(chargeValue):
     global dayTimeDrivingSpeedActuallyUsed
@@ -156,6 +171,7 @@ def turnOffMotors():
     #mhArm.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
     #mhArm.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
     #mhArm.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
+    p.ChangeDutyCycle(0.0)
 
 def incrementArmServo(channel, amount):
 
@@ -168,6 +184,18 @@ def incrementArmServo(channel, amount):
     if armServo[channel] < servoMin[channel]:
         armServo[channel] = servoMin[channel]
     pwm.setPWM(channel, 0, armServo[channel])
+
+def incrementCamServo(amount):
+    global camServo
+    camServo += amount
+    
+    log.debug("cam servo positions:", camServo)
+    
+    if camServo > camServoMax:
+        camServo = camServoMax
+    if camServo < camServoMin:
+        camServo = camServoMin
+    p.ChangeDutyCycle(camServo)
 
 def runMotor(motorIndex, direction):
     motor = mh.getMotor(motorIndex+1)
@@ -200,10 +228,14 @@ def setup(robot_config):
     global chargeIONumber
     global forward
     global backward
+    global left_rotate
+    global right_rotate
     global left
     global right
     global straightDelay
     global turnDelay
+    global sideDelay
+    global p
 
     GPIO.setmode(GPIO.BCM)
     chargeIONumber = robot_config.getint('motor_hat', 'chargeIONumber')
@@ -213,12 +245,21 @@ def setup(robot_config):
 
     forward = json.loads(robot_config.get('motor_hat', 'forward'))
     backward = times(forward, -1)
+    left_rotate = json.loads(robot_config.get('motor_hat', 'left_rotate'))
+    right_rotate = times(left_rotate, -1)
     left = json.loads(robot_config.get('motor_hat', 'left'))
     right = times(left, -1)
 
     straightDelay = robot_config.getfloat('robot', 'straight_delay')
     turnDelay = robot_config.getfloat('robot', 'turn_delay')
+    sideDelay = robot_config.getfloat('robot', 'side_delay')
 
+    if camServoEnabled:
+        # start 'GPIO'
+	#GPIO.setmode(GPIO.BOARD)
+	GPIO.setup(18, GPIO.OUT)
+	p = GPIO.PWM(18, 50)
+	p.start(camServo)
 
     if motorsEnabled:
         # create a default object, no changes to I2C address or frequency
@@ -227,6 +268,8 @@ def setup(robot_config):
         atexit.register(turnOffMotors)
         motorA = mh.getMotor(1)
         motorB = mh.getMotor(2)
+
+    turnOffMotors()
 
     # Initialise the PWM device
 #    pwm = PWM(0x42)
@@ -277,32 +320,44 @@ def move( args ):
     if command == 'l':
         drivingSpeed = turningSpeedActuallyUsed
         for motorIndex in range(4):
-            runMotor(motorIndex, left[motorIndex])
+            runMotor(motorIndex, left_rotate[motorIndex])
         time.sleep(turnDelay)
     if command == 'r':
         drivingSpeed = turningSpeedActuallyUsed
         for motorIndex in range(4):
-            runMotor(motorIndex, right[motorIndex])
+            runMotor(motorIndex, right_rotate[motorIndex])
         time.sleep(turnDelay)
+    if command == 'q':
+        drivingSpeed = drivingSpeedActuallyUsed
+        for motorIndex in range(4):
+            runMotor(motorIndex, left[motorIndex])
+        time.sleep(sideDelay)
+    if command == 'e':
+        drivingSpeed = drivingSpeedActuallyUsed
+        for motorIndex in range(4):
+            runMotor(motorIndex, right[motorIndex])
+        time.sleep(sideDelay)
     if command == 'u':
         #mhArm.getMotor(1).setSpeed(127)
         #mhArm.getMotor(1).run(Adafruit_MotorHAT.BACKWARD)
-        incrementArmServo(1, 10)
-        time.sleep(0.05)
+        incrementCamServo(-0.2)
+        time.sleep(0.02)
     if command == 'd':
         #mhArm.getMotor(1).setSpeed(127)
         #mhArm.getMotor(1).run(Adafruit_MotorHAT.FORWARD)
-        incrementArmServo(1, -10)
-        time.sleep(0.05)
+        incrementCamServo(0.2)
+        time.sleep(0.02)
     if command == 'o':
-        #mhArm.getMotor(2).setSpeed(127)
-        #mhArm.getMotor(2).run(Adafruit_MotorHAT.BACKWARD)
-        incrementArmServo(2, -10)
+        #mhArm.getMotor(1).setSpeed(127)
+        #mhArm.getMotor(1).run(Adafruit_MotorHAT.BACKWARD)
+        runMotor(0, 1)
+	#incrementArmServo(2, -10)
         time.sleep(0.05)
     if command == 'c':
-        #mhArm.getMotor(2).setSpeed(127)
-        #mhArm.getMotor(2).run(Adafruit_MotorHAT.FORWARD)
-        incrementArmServo(2, 10)
+        #mhArm.getMotor(1).setSpeed(127)
+        #mhArm.getMotor(1).run(Adafruit_MotorHAT.FORWARD)
+		runMotor(0, -1)
+        #incrementArmServo(2, 10)
         time.sleep(0.05)
 
     turnOffMotors()
