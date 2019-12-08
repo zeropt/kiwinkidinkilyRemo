@@ -38,9 +38,12 @@ def combine(Roll, Pitch, Yaw, Theta):
 
 while 1:
 	readData()
-	roll = data[0]-127.0
-	pitch = data[1]-127.0
-	throttle = data[2]-127.0
-	yaw = data[3]-127.0
-	print(throttle)
+	roll = (data[0]-127.0)/127.0
+	pitch = (data[1]-127.0)/127.0
+	throttle = (data[2]-127.0)/127.0
+	yaw = (data[3]-127.0)/127.0
+	kit.motor1.throttle = throttle
+	kit.motor2.throttle = combine(roll, pitch, yaw, pi/3.0)
+	kit.motor3.throttle = combine(roll, pitch, yaw, 5.0*pi/6.0)
+	kit.motor4.throttle = combine(roll, pitch, yaw, 5.0*pi/2.0)
 	time.sleep(0.1)
