@@ -18,6 +18,7 @@ pitch = 0.0
 throttle = 0.0
 yaw = 0.0
 
+angle = 0.0
 setpoint = 0.0
 
 kr = 0.8
@@ -72,7 +73,7 @@ def constrain(x, Min, Max):
         x = Max
     if x < Min:
         x = Min
-    return i
+    return x
 
 def combine(Roll, Pitch, Yaw, Theta):
     rVal = ky*Yaw + kp*cos(Theta)*Pitch + kr*cos(Theta+pi/2.0)*Roll
@@ -80,17 +81,18 @@ def combine(Roll, Pitch, Yaw, Theta):
 
 def getGyroData():
     angle_z, angle_x, angle_y = sensor.euler
+    if angle_z == None:
+        return setpoint
     angle = angle_z*2*pi/370.0
     if abs(setpoint-(angle+2*pi)) < abs(setpoint-angle):
         angle += 2*pi
     elif abs(setpoint-(angle-2*pi)) < abs(setpoint-angle):
         angle -= 2*pi
-    return angle
 
 while 1:
     #readData()
+    getGyroData()
     pid.setSetpoint(setpoint)
-    angle = getGyroData()
     pid.update(angle)
     roll = 0.0 #(data[0]-127.0)/127.0
     pitch = 0.0 #(data[1]-127.0)/127.0
