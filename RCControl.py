@@ -3,12 +3,12 @@ from math import *
  
 import board
 import busio
-#import adafruit_lsm9ds1
+import adafruit_bno055
 from adafruit_motorkit import MotorKit
  
 # Create library object using our Bus I2C port
 i2c = busio.I2C(board.SCL, board.SDA)
-#sensor = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
+sensor = adafruit_bno055.BNO055(i2c)
 kit = MotorKit()
 
 address = 0x08
