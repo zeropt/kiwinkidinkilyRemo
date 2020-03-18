@@ -25,9 +25,9 @@ kp = 0.8
 ky = 0.8
 
 #PID Coefficients
-kP = 1.0
-kI = 0.0
-kD = 0.0
+kP = 1.5
+kI = 0.1
+kD = 0.05
 
 class pid_controller:
     def __init__(self, kP = 1.0, kI = 1.0, kD = 1.0, setpoint = 0.0):
