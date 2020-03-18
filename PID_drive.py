@@ -84,24 +84,24 @@ def getGyroData():
 
 while 1:
     #readData()
-    angle = getGyroData()
+    in_angle = getGyroData()
     pid.setSetpoint(setpoint)
     roll = 0.0 #(data[0]-127.0)/127.0
     pitch = 0.0 #(data[1]-127.0)/127.0
     throttle = 0.0 #(data[2]-127.0)/127.0
     yaw = 0.0 #(data[3]-127.0)/127.0
-    if angle == None:
+    if in_angle == None:
         pid.resetTime()
     else:
-        angle = angle_z*2*pi/370.0
+        angle = in_angle*2*pi/370.0
         if abs(setpoint-(angle+2*pi)) < abs(setpoint-angle):
             angle += 2*pi
         elif abs(setpoint-(angle-2*pi)) < abs(setpoint-angle):
             angle -= 2*pi
         pid.update(angle)
-        yaw = pid.getOutput()
+        yaw = -pid.getOutput()
     print("setpoint: {}".format(setpoint))
-    print("angle: {}".format(angle))
+    print("angle: {}".format(in_angle))
     print("output: {}".format(yaw))
     print()
     kit.motor1.throttle = throttle
