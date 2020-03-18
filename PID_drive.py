@@ -90,7 +90,8 @@ def getGyroData():
 while 1:
     #readData()
     pid.setSetpoint(setpoint)
-    pid.update(getGyroData())
+    angle = getGyroData()
+    pid.update(angle)
     roll = 0.0 #(data[0]-127.0)/127.0
     pitch = 0.0 #(data[1]-127.0)/127.0
     throttle = 0.0 #(data[2]-127.0)/127.0
