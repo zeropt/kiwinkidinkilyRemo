@@ -20,7 +20,7 @@ yaw = 0.0
 
 setpoint = 0.0
 
-kr = 1.0
+kr = 0.8
 kp = 0.8
 ky = 0.8
 
@@ -114,5 +114,5 @@ while 1:
     kit.motor1.throttle = constrain(throttle, -1.0, 1.0)
     kit.motor2.throttle = combine(roll, pitch, yaw, pi/3.0)
     kit.motor3.throttle = combine(roll, pitch, yaw, 5.0*pi/6.0)
-    kit.motor4.throttle = combine(roll, pitch, yaw, 5.0*pi/2.0)
+    kit.motor4.throttle = combine(roll, pitch, yaw, 3.0*pi/2.0)
     time.sleep(0.1)
