@@ -32,7 +32,7 @@ def constrain(x, Min, Max):
 		x = Max
 	if x < Min:
 		x = Min
-	return i
+	return x
 
 def combine(Roll, Pitch, Yaw, Theta):
 	rVal = ky*Yaw + kp*cos(Theta)*Pitch + kr*cos(Theta+pi/2.0)*Roll

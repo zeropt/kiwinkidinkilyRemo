@@ -18,7 +18,6 @@ pitch = 0.0
 throttle = 0.0
 yaw = 0.0
 
-angle = 0.0
 setpoint = 0.0
 
 kr = 0.8
@@ -81,23 +80,26 @@ def combine(Roll, Pitch, Yaw, Theta):
 
 def getGyroData():
     angle_z, angle_x, angle_y = sensor.euler
-    if angle_z == None:
-        return setpoint
-    angle = angle_z*2*pi/370.0
-    if abs(setpoint-(angle+2*pi)) < abs(setpoint-angle):
-        angle += 2*pi
-    elif abs(setpoint-(angle-2*pi)) < abs(setpoint-angle):
-        angle -= 2*pi
+    return angle_z
 
 while 1:
     #readData()
-    getGyroData()
+    angle = getGyroData()
     pid.setSetpoint(setpoint)
-    pid.update(angle)
     roll = 0.0 #(data[0]-127.0)/127.0
     pitch = 0.0 #(data[1]-127.0)/127.0
     throttle = 0.0 #(data[2]-127.0)/127.0
-    yaw = pid.getOutput() #(data[3]-127.0)/127.0
+    yaw = 0.0 #(data[3]-127.0)/127.0
+    if angle == None:
+        pid.resetTime()
+    else:
+        angle = angle_z*2*pi/370.0
+        if abs(setpoint-(angle+2*pi)) < abs(setpoint-angle):
+            angle += 2*pi
+        elif abs(setpoint-(angle-2*pi)) < abs(setpoint-angle):
+            angle -= 2*pi
+        pid.update(angle)
+        yaw = pid.getOutput()
     print("setpoint: {}".format(setpoint))
     print("angle: {}".format(angle))
     print("output: {}".format(yaw))
