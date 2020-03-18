@@ -13,6 +13,9 @@ kit = MotorKit()
 
 address = 0x08
 
+prev_active = 0
+prev_throttle = 0.0
+
 roll = 0.0
 pitch = 0.0
 throttle = 0.0
@@ -20,6 +23,7 @@ yaw = 0.0
 
 setpoint = 0.0
 heading = 0.0
+field_zero = 0.0
 
 kr = 0.8
 kp = 0.8
@@ -65,7 +69,7 @@ class pid_controller:
 
 pid = pid_controller(kP, kI, kD, setpoint)
 
-data = bytearray(4)
+data = bytearray(5)
 
 def readData():
     i2c.readfrom_into(address, data, start = 0, end=len(data))
@@ -88,33 +92,51 @@ def getGyroData():
 while 1:
     readData()
     in_angle = getGyroData()
-    roll = (data[0]-127.0)/127.0
-    pitch = (data[1]-127.0)/127.0
-    throttle = (data[2]-127.0)/127.0
-    yaw = 0.0 #(data[3]-127.0)/127.0
-    setpoint -= yaw_limiter*(data[3]-127.0)/127.0
-    if setpoint >= 2*pi:
-        setpoint -= 2*pi
-    if setpoint < 0.0:
-        setpoint += 2*pi
-    pid.setSetpoint(setpoint)
-    if in_angle == None:
-        pid.resetTime()
+    if data[0] > 0:
+        roll = (data[1]-127.0)/127.0
+        pitch = (data[2]-127.0)/127.0
+        throttle = (data[3]-127.0)/127.0
+        yaw = 0.0 #(data[4]-127.0)/127.0
+        setpoint -= yaw_limiter*(data[4]-127.0)/127.0
+        if setpoint >= 2*pi:
+            setpoint -= 2*pi
+        if setpoint < 0.0:
+            setpoint += 2*pi
+        pid.setSetpoint(setpoint)
+        if in_angle == None:
+            pid.resetTime()
+        else:
+            angle = in_angle*2*pi/370.0
+            if abs(setpoint-(angle+2*pi)) < abs(setpoint-angle):
+                angle += 2*pi
+            elif abs(setpoint-(angle-2*pi)) < abs(setpoint-angle):
+                angle -= 2*pi
+            pid.update(angle)
+            heading = angle
+            yaw -= pid.getOutput()
+        #print("setpoint: {}".format(setpoint))
+        #print("angle: {}".format(in_angle))
+        #print("output: {}".format(yaw))
+        #print()
+        kit.motor1.throttle = 0.0
+        if throttle > 0.0:
+            kit.motor2.throttle = combine(roll, pitch, yaw, pi/3.0)
+            kit.motor3.throttle = combine(roll, pitch, yaw, 5.0*pi/6.0)
+            kit.motor4.throttle = combine(roll, pitch, yaw, 3.0*pi/2.0)
+        else:
+            if prev_throttle > 0.0:
+                field_zero = heading
+            kit.motor2.throttle = combine(roll, pitch, yaw, pi/3.0 - heading + field_zero)
+            kit.motor3.throttle = combine(roll, pitch, yaw, 5.0*pi/6.0 - heading + field_zero)
+            kit.motor4.throttle = combine(roll, pitch, yaw, 3.0*pi/2.0 - heading + field_zero)
+        prev_throttle = throttle
+        prev_active = data[0]
     else:
-        angle = in_angle*2*pi/370.0
-        if abs(setpoint-(angle+2*pi)) < abs(setpoint-angle):
-            angle += 2*pi
-        elif abs(setpoint-(angle-2*pi)) < abs(setpoint-angle):
-            angle -= 2*pi
-        pid.update(angle)
-        heading = angle
-        yaw -= pid.getOutput()
-    #print("setpoint: {}".format(setpoint))
-    #print("angle: {}".format(in_angle))
-    #print("output: {}".format(yaw))
-    #print()
-    kit.motor1.throttle = constrain(throttle, -1.0, 1.0)
-    kit.motor2.throttle = combine(roll, pitch, yaw, pi/3.0 - heading)
-    kit.motor3.throttle = combine(roll, pitch, yaw, 5.0*pi/6.0 - heading)
-    kit.motor4.throttle = combine(roll, pitch, yaw, 3.0*pi/2.0 - heading)
+        if prev_active > 0:
+            kit.motor1.throttle = 0.0
+            kit.motor2.throttle = 0.0
+            kit.motor3.throttle = 0.0
+            kit.motor4.throttle = 0.0
+            prev_throttle = 
+            prev_active = 0
     time.sleep(0.1)
