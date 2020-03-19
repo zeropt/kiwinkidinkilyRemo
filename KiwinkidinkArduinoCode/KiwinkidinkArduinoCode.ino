@@ -94,6 +94,7 @@ void loop() {
   final_pitch = pitch;
   final_throttle = throttle;
   final_yaw = yaw;
+  updateLEDs();
 }
 
 // function that executes whenever data is requested by master
