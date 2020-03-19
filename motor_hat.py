@@ -351,12 +351,12 @@ def move( args ):
         #mhArm.getMotor(1).setSpeed(127)
         #mhArm.getMotor(1).run(Adafruit_MotorHAT.BACKWARD)
         runMotor(0, 1)
-	    #incrementArmServo(2, -10)
+	#incrementArmServo(2, -10)
         time.sleep(0.05)
     if command == 'c':
         #mhArm.getMotor(1).setSpeed(127)
         #mhArm.getMotor(1).run(Adafruit_MotorHAT.FORWARD)
-		runMotor(0, -1)
+	runMotor(0, -1)
         #incrementArmServo(2, 10)
         time.sleep(0.05)
 
