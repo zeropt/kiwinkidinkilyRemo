@@ -40,18 +40,18 @@ def move(args):
     if command == 'F':
         # Your hardware movement code for forward goes here
         return
-    elif command == 'B':
+    if command == 'B':
         # Your hardware movement code for backwards goes here
         return
-    elif command == 'L':
+    if command == 'L':
         # Your hardware movement code for left goes here
         return
-    elif command == 'R':
+    if command == 'R':
         # Your hardware movement code for right goes here
         return
-    elif command == 'u':
+    if command == 'u':
         incrementCamServo(-0.2)
         time.sleep(0.02)
-    elif command == 'd':
+    if command == 'd':
         incrementCamServo(0.2)
         time.sleep(0.02)
