@@ -23,10 +23,11 @@ def stopMotors():
     cs.ChangeDutyCycle(0.0)
 
 def incrementCamServo(amount):
+    global camServo
     camServo += amount
-    
+
     log.debug("cam servo positions:", camServo)
-    
+
     if camServo > camServoMax:
         camServo = camServoMax
     if camServo < camServoMin:
@@ -36,7 +37,7 @@ def incrementCamServo(amount):
 def setup(robot_config):
     global mh
     global cs
-    global camServo
+    #global camServo
 
     mh = Adafruit_MotorHAT(addr=0x60)
     GPIO.setmode(GPIO.BCM)
