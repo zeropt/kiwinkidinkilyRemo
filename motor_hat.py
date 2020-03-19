@@ -1,6 +1,4 @@
 import RPi.GPIO as GPIO
-import board
-import busio
 import datetime
 import os
 import getpass
@@ -39,13 +37,11 @@ mh = None
 motorA = None
 motorB = None
 p = None
-arduino_address = 0x08
 turningSpeedActuallyUsed = None
 dayTimeDrivingSpeedActuallyUsed = None
 nightTimeDrivingSpeedActuallyUsed = None
 drivingSpeed = 0
 chargeValue = 100
-i2c = None
 
 secondsToCharge = None
 secondsToDischarge = None
@@ -167,13 +163,10 @@ def reportNeedToCharge():
 
 
 def turnOffMotors():
-    data = bytearray(5)
-    i2c.readfrom_into(arduino_address, data, start = 0, end=len(data))
-    if data[0] > 0:
-        mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
-        mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
-        mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
-        mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
+    mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
+    mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
+    mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
+    mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
     #mhArm.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
     #mhArm.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
     #mhArm.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
@@ -205,22 +198,19 @@ def incrementCamServo(amount):
     p.ChangeDutyCycle(camServo)
 
 def runMotor(motorIndex, direction):
-    data = bytearray(5)
-    i2c.readfrom_into(arduino_address, data, start = 0, end=len(data))
-    if data[0] > 0:
-        motor = mh.getMotor(motorIndex+1)
-        if direction == 1:
-            motor.setSpeed(drivingSpeed)
-            motor.run(Adafruit_MotorHAT.FORWARD)
-        if direction == -1:
-            motor.setSpeed(drivingSpeed)
-            motor.run(Adafruit_MotorHAT.BACKWARD)
-        if direction == 0.5:
-            motor.setSpeed(128)
-            motor.run(Adafruit_MotorHAT.FORWARD)
-        if direction == -0.5:
-            motor.setSpeed(128)
-            motor.run(Adafruit_MotorHAT.BACKWARD)
+    motor = mh.getMotor(motorIndex+1)
+    if direction == 1:
+        motor.setSpeed(drivingSpeed)
+        motor.run(Adafruit_MotorHAT.FORWARD)
+    if direction == -1:
+        motor.setSpeed(drivingSpeed)
+        motor.run(Adafruit_MotorHAT.BACKWARD)
+    if direction == 0.5:
+        motor.setSpeed(128)
+        motor.run(Adafruit_MotorHAT.FORWARD)
+    if direction == -0.5:
+        motor.setSpeed(128)
+        motor.run(Adafruit_MotorHAT.BACKWARD)
 
 def times(lst, number):
     return [x*number for x in lst]
@@ -270,7 +260,6 @@ def setup(robot_config):
 	GPIO.setup(18, GPIO.OUT)
 	p = GPIO.PWM(18, 50)
 	p.start(camServo)
-    i2c = busio.I2C(board.SCL, board.SDA)
 
     if motorsEnabled:
         # create a default object, no changes to I2C address or frequency
@@ -362,7 +351,7 @@ def move( args ):
         #mhArm.getMotor(1).setSpeed(127)
         #mhArm.getMotor(1).run(Adafruit_MotorHAT.BACKWARD)
         runMotor(0, 1)
-	#incrementArmServo(2, -10)
+	    #incrementArmServo(2, -10)
         time.sleep(0.05)
     if command == 'c':
         #mhArm.getMotor(1).setSpeed(127)
