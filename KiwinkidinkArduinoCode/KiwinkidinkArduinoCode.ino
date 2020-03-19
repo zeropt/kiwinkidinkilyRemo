@@ -114,3 +114,27 @@ void receiveEvent(int howMany) {
   }
   mode = x;
 }
+
+void updateLEDs() {
+  switch (mode) {
+    case 0:
+    colorWipe(strip.Color(0, 0, 0));
+    break;
+    case 1:
+    colorWipe(strip.Color(255, 0, 0));
+    break;
+    case 2:
+    colorWipe(strip.Color(0, 255, 0));
+    break;
+    case 3:
+    colorWipe(strip.Color(0, 0, 255));
+    break;
+  }
+}
+
+void colorWipe(uint32_t c) {
+  for(uint16_t i=0; i<strip.numPixels(); i++) {
+    strip.setPixelColor(i, c);
+  }
+  strip.show();
+}
