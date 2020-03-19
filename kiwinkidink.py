@@ -11,6 +11,17 @@ camServoMin = 6.0
 camServoMax = 11.5
 camServo = 8.0
 
+def stopMotors():
+    mh.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
+    mh.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
+    mh.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
+    mh.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
+    #mhArm.getMotor(1).run(Adafruit_MotorHAT.RELEASE)
+    #mhArm.getMotor(2).run(Adafruit_MotorHAT.RELEASE)
+    #mhArm.getMotor(3).run(Adafruit_MotorHAT.RELEASE)
+    #mhArm.getMotor(4).run(Adafruit_MotorHAT.RELEASE)
+    cs.ChangeDutyCycle(0.0)
+
 def incrementCamServo(amount):
     camServo += amount
     
@@ -32,6 +43,7 @@ def setup(robot_config):
     GPIO.setup(18, GPIO.OUT)
     cs = GPIO.PWM(18, 50)
     cs.start(camServo)
+    stopMotors()
 
 def move(args):
     command=args['button']['command']
@@ -56,3 +68,4 @@ def move(args):
     if command == 'd':
         incrementCamServo(0.2)
         time.sleep(0.02)
+    stopMotors()
