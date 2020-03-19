@@ -1,6 +1,6 @@
 import time
 from math import *
- 
+
 import board
 import busio
 
@@ -8,7 +8,7 @@ i2c = busio.I2C(board.SCL, board.SDA)
 
 address = 0x08
 
-mode = input("LEDMode: ")
+mode = int(input("LEDMode: "))
 
 buf = bytearray(1)
 
