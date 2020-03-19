@@ -28,6 +28,7 @@ def setup(robot_config):
     global camServo
 
     mh = Adafruit_MotorHAT(addr=0x60)
+    GPIO.setmode(GPIO.BCM)
     GPIO.setup(18, GPIO.OUT)
     cs = GPIO.PWM(18, 50)
     cs.start(camServo)
