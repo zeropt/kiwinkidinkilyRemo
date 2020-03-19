@@ -95,6 +95,8 @@ void loop() {
   final_throttle = throttle;
   final_yaw = yaw;
   updateLEDs();
+  //Serial.print("LEDS are in mode: ");
+  //Serial.println(mode);
 }
 
 // function that executes whenever data is requested by master
@@ -103,32 +105,44 @@ void requestEvent() {
   byte buf[] = {(byte)(final_active), (byte)(final_roll+127), (byte)(final_pitch+127), (byte)(final_throttle+127), (byte)(final_yaw+127)};
   Wire.write(buf, 5); // respond with message of 5 bytes
   // as expected by master
-  Serial.println(buf[2]);
+  //Serial.println(buf[2]);
 }
 
 // function that executes whenever data is received from master
 // this function is registered as an event, see setup()
 void receiveEvent(int howMany) {
-  int x;
   while (1 < Wire.available()) { // loop through all but the last
-    x = Wire.read(); // receive byte as an int
+    char c = Wire.read(); // receive byte as an int
   }
+  int x = Wire.read();
   mode = x;
 }
 
 void updateLEDs() {
   switch (mode) {
     case 0:
-    colorWipe(strip.Color(0, 0, 0));
+    colorWipe(strip.Color(0, 0, 0)); //off
     break;
     case 1:
-    colorWipe(strip.Color(255, 0, 0));
+    colorWipe(strip.Color(255, 255, 255)); //white
     break;
     case 2:
-    colorWipe(strip.Color(0, 255, 0));
+    colorWipe(strip.Color(255, 0, 0)); //Red
     break;
     case 3:
-    colorWipe(strip.Color(0, 0, 255));
+    colorWipe(strip.Color(255, 50, 0)); //Orange
+    break;
+    case 4:
+    colorWipe(strip.Color(255, 200, 0)); //yellow
+    break;
+    case 5:
+    colorWipe(strip.Color(0, 255, 0)); //green
+    break;
+    case 6:
+    colorWipe(strip.Color(0, 0, 255)); //blue
+    break;
+    case 7:
+    colorWipe(strip.Color(255, 0, 255)); //purple
     break;
   }
 }
