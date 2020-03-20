@@ -96,8 +96,8 @@ while 1:
         roll = (data[1]-127.0)/127.0
         pitch = (data[2]-127.0)/127.0
         throttle = (data[3]-127.0)/127.0
-        yaw = 0.0 #(data[4]-127.0)/127.0
-        setpoint -= yaw_limiter*(data[4]-127.0)/127.0
+        yaw = (data[4]-127.0)/127.0
+        #setpoint -= yaw_limiter*(data[4]-127.0)/127.0
         if setpoint >= 2*pi:
             setpoint -= 2*pi
         if setpoint < 0.0:
@@ -113,6 +113,8 @@ while 1:
                 angle -= 2*pi
             pid.update(angle)
             heading = angle
+            setpoint_error = angle - setpoint
+            setpoint += setpoint*abs(yaw)
             yaw -= pid.getOutput()
         #print("setpoint: {}".format(setpoint))
         #print("angle: {}".format(in_angle))
