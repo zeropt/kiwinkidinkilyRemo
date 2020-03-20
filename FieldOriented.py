@@ -89,6 +89,13 @@ def getGyroData():
     angle_z, angle_x, angle_y = sensor.euler
     return angle_z
 
+def customMax(values):
+    returnVal = 0.0
+    for i in range(len(values)):
+        if values[i] > returnVal:
+            returnVal = values[i]
+    return returnVal
+
 while 1:
     readData()
     in_angle = getGyroData()
@@ -119,7 +126,7 @@ while 1:
         #print("output: {}".format(yaw))
         #print()
         kit.motor1.throttle = 0.0
-        throttle_max = max([roll, pitch, yaw])
+        throttle_max = customMax([roll, pitch, yaw])
         print("throttle_max: {}".format(throttle_max))
         motor2_speed = 0.0
         motor3_speed = 0.0
@@ -134,7 +141,7 @@ while 1:
             motor2_speed = combine(roll, pitch, yaw, pi/3.0 - heading + field_zero)
             motor3_speed = combine(roll, pitch, yaw, 5.0*pi/6.0 - heading + field_zero)
             motor4_speed = combine(roll, pitch, yaw, 3.0*pi/2.0 - heading + field_zero)
-        motor_max = max([motor2_speed, motor3_speed, motor4_speed])
+        motor_max = customMax([motor2_speed, motor3_speed, motor4_speed])
         throttle_mult = throttle_max/motor_max
         kit.motor2.throttle = constrain(throttle_mult*motor2_speed, -1.0, 1.0)
         kit.motor3.throttle = constrain(throttle_mult*motor3_speed, -1.0, 1.0)
