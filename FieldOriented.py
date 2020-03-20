@@ -25,12 +25,6 @@ setpoint = 0.0
 heading = 0.0
 field_zero = 0.0
 
-kr = 0.8
-kp = 0.8
-ky = 0.8
-
-yaw_limiter = 0.05;
-
 #PID Coefficients
 kP = 1.5
 kI = 0.0
@@ -111,7 +105,6 @@ while 1:
         pitch = (data[2]-127.0)/127.0
         throttle = (data[3]-127.0)/127.0
         yaw = (data[4]-127.0)/127.0
-        #setpoint -= yaw_limiter*(data[4]-127.0)/127.0
         if setpoint >= 2*pi:
             setpoint -= 2*pi
         if setpoint < 0.0:
