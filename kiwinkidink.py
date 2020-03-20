@@ -155,7 +155,8 @@ def move(args):
 
     log.debug("move kiwinkidink command : %s", command)
 
-    if RCConnected() == False:
+    #if RCConnected() == False:
+    if True:
         if command == 'f':
             translate(0.0, 1.0, 0.0, 1.0, 0.25) #forward
         if command == 'b':
