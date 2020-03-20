@@ -1,4 +1,5 @@
 import logging
+from math import *
 import time
 import board
 import busio
@@ -20,7 +21,7 @@ camServo = 8.0
 arduino_address = 0x08
 
 #PID Coefficients
-kP = 1.5
+kP = 1.0
 kI = 0.0
 kD = 0.01
 
@@ -108,7 +109,7 @@ def setKiwiMotors(roll, pitch, yaw, scale):
     kit.motor3.throttle = constrain(throttle_mult*motor3_speed, -1.0, 1.0)
     kit.motor4.throttle = constrain(throttle_mult*motor4_speed, -1.0, 1.0)
 
-def translate(x, y, turn_angle, delta_t, speed):
+def translate(x, y, turn_angle, speed, delta_t):
     prev_t = time.time()
     pid.setSetpoint(turn_angle)
     in_angle = getGyroData()
@@ -116,16 +117,16 @@ def translate(x, y, turn_angle, delta_t, speed):
         in_angle = getGyroData()
     field_zero = in_angle*2*pi/370.0
     pid.resetTime()
-    while ((time - prev_t) < delta_t):
+    while ((time.time() - prev_t) < delta_t):
         yaw = 0.0
         in_angle = getGyroData()
         if in_angle == None:
             pid.resetTime()
         else:
             angle = in_angle*2*pi/370.0 - field_zero
-            if abs(setpoint-(angle+2*pi)) < abs(setpoint-angle):
+            if abs(turn_angle-(angle+2*pi)) < abs(turn_angle-angle):
                 angle += 2*pi
-            elif abs(setpoint-(angle-2*pi)) < abs(setpoint-angle):
+            elif abs(turn_angle-(angle-2*pi)) < abs(turn_angle-angle):
                 angle -= 2*pi
             pid.update(angle)
             yaw = -pid.getOutput()
@@ -162,9 +163,9 @@ def move(args):
         if command == 'b':
             translate(0.0, -1.0, 0.0, 1.0, 0.25) #backwards
         if command == 'l':
-            translate(0.0, 0.0, -0.25, 1.0, 0.25) #rotate left
+            translate(0.0, 0.0, -0.25, 0.75, 0.25) #rotate left
         if command == 'r':
-            translate(0.0, 0.0, 0.25, 1.0, 0.25) #rotate right
+            translate(0.0, 0.0, 0.25, 0.75, 0.25) #rotate right
         if command == 'q':
             translate(-1.0, 0.0, 0.0, 1.0, 0.25) #travel left
         if command == 'e':
@@ -176,9 +177,9 @@ def move(args):
             incrementCamServo(0.2)
             time.sleep(0.02)
         if command == 'o':
-            kit.motor1.throttle = 1.0
+            kit.motor1.throttle = -1.0
             time.sleep(0.05)
         if command == 'c':
-            kit.motor1.throttle = -1.0
+            kit.motor1.throttle = 1.0
             time.sleep(0.05)
         stopMotors()
