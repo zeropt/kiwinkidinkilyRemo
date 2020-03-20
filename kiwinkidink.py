@@ -1,5 +1,7 @@
 import logging
 import time
+import board
+import busio
 from Adafruit_MotorHAT import Adafruit_MotorHAT, Adafruit_DCMotor
 import RPi.GPIO as GPIO
 import adafruit_bno055
@@ -7,6 +9,7 @@ import adafruit_bno055
 log = logging.getLogger('RemoTV.hardware.kiwinkidink')
 
 mh = None
+i2c = None
 sensor = None
 
 camServoMin = 6.0
@@ -39,6 +42,7 @@ def incrementCamServo(amount):
 def setup(robot_config):
     global mh
     global cs
+    global i2c
     global sensor
     #global camServo
 
@@ -47,7 +51,8 @@ def setup(robot_config):
     GPIO.setup(18, GPIO.OUT)
     cs = GPIO.PWM(18, 50)
     cs.start(camServo)
-    sensor = adafruit_bno055.BNO055()
+    i2c = busio.I2C(board.SCL, board.SDA)
+    sensor = adafruit_bno055.BNO055(i2c)
     stopMotors()
 
 def move(args):
