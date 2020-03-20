@@ -156,16 +156,16 @@ def move(args):
 
     log.debug("move kiwinkidink command : %s", command)
 
-    #if RCConnected() == False:
-    if True:
+    if RCConnected() == False:
+    #if True:
         if command == 'f':
             translate(0.0, 1.0, 0.0, 1.0, 0.2) #forward
         if command == 'b':
             translate(0.0, -1.0, 0.0, 1.0, 0.2) #backwards
         if command == 'l':
-            translate(0.0, 0.0, -0.25, 0.75, 0.2) #rotate left
+            translate(0.0, 0.0, -0.25, 1.0, 0.2) #rotate left
         if command == 'r':
-            translate(0.0, 0.0, 0.25, 0.75, 0.2) #rotate right
+            translate(0.0, 0.0, 0.25, 1.0, 0.2) #rotate right
         if command == 'q':
             translate(-1.0, 0.0, 0.0, 1.0, 0.2) #travel left
         if command == 'e':
