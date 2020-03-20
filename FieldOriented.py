@@ -114,7 +114,7 @@ while 1:
             pid.update(angle)
             heading = angle
             setpoint_error = angle - setpoint
-            setpoint += setpoint*abs(yaw)
+            setpoint += setpoint_error*abs(yaw)
             yaw -= pid.getOutput()
         #print("setpoint: {}".format(setpoint))
         #print("angle: {}".format(in_angle))
