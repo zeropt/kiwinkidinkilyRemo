@@ -82,8 +82,8 @@ def constrain(x, Min, Max):
     return x
 
 def combine(Roll, Pitch, Yaw, Theta):
-    rVal = ky*Yaw + kp*cos(Theta)*Pitch + kr*cos(Theta+pi/2.0)*Roll
-    return constrain(rVal, -1.0, 1.0)
+    rVal = Yaw + cos(Theta)*Pitch + cos(Theta+pi/2.0)*Roll
+    return rVal, -1.0, 1.0
 
 def getGyroData():
     angle_z, angle_x, angle_y = sensor.euler
@@ -119,16 +119,24 @@ while 1:
         #print("output: {}".format(yaw))
         #print()
         kit.motor1.throttle = 0.0
+        throttle_max = max(roll, pitch, yaw)
+        motor2_speed = 0.0
+        motor3_speed = 0.0
+        motor4_speed = 0.0
         if throttle > 0.0:
-            kit.motor2.throttle = combine(roll, pitch, yaw, pi/3.0)
-            kit.motor3.throttle = combine(roll, pitch, yaw, 5.0*pi/6.0)
-            kit.motor4.throttle = combine(roll, pitch, yaw, 3.0*pi/2.0)
+            motor2_speed = combine(roll, pitch, yaw, pi/3.0)
+            motor3_speed = combine(roll, pitch, yaw, 5.0*pi/6.0)
+            motor4_speed = combine(roll, pitch, yaw, 3.0*pi/2.0)
         else:
             if prev_throttle > 0.0:
                 field_zero = heading
-            kit.motor2.throttle = combine(roll, pitch, yaw, pi/3.0 - heading + field_zero)
-            kit.motor3.throttle = combine(roll, pitch, yaw, 5.0*pi/6.0 - heading + field_zero)
-            kit.motor4.throttle = combine(roll, pitch, yaw, 3.0*pi/2.0 - heading + field_zero)
+            motor2_speed = combine(roll, pitch, yaw, pi/3.0 - heading + field_zero)
+            motor3_speed = combine(roll, pitch, yaw, 5.0*pi/6.0 - heading + field_zero)
+            motor4_speed = combine(roll, pitch, yaw, 3.0*pi/2.0 - heading + field_zero)
+        throttle_mult = throttle_max/max(motor2_speed, motor3_speed, motor4_speed)
+        kit.motor2.throttle = constrain(throttle_mult*motor2_speed, -1.0, 1.0)
+        kit.motor3.throttle = constrain(throttle_mult*motor3_speed, -1.0, 1.0)
+        kit.motor4.throttle = constrain(throttle_mult*motor4_speed, -1.0, 1.0)
         prev_throttle = throttle
         prev_active = data[0]
     else:
