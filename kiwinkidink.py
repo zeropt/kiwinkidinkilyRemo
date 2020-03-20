@@ -17,6 +17,8 @@ camServoMin = 6.0
 camServoMax = 11.5
 camServo = 8.0
 
+arduino_address = 0x08
+
 #PID Coefficients
 kP = 1.5
 kI = 0.0
@@ -74,7 +76,7 @@ def incrementCamServo(amount):
 
 def RCConnected():
     data = bytearray(5)
-    i2c.readfrom_into(address, data, start = 0, end=len(data))
+    i2c.readfrom_into(arduino_address, data, start = 0, end=len(data))
     return (data[0] > 0);
 
 def getGyroData():
