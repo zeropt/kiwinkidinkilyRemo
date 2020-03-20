@@ -21,7 +21,7 @@ camServo = 8.0
 arduino_address = 0x08
 
 #PID Coefficients
-kP = 1.0
+kP = 1.5
 kI = 0.0
 kD = 0.01
 
@@ -159,17 +159,17 @@ def move(args):
     #if RCConnected() == False:
     if True:
         if command == 'f':
-            translate(0.0, 1.0, 0.0, 1.0, 0.25) #forward
+            translate(0.0, 1.0, 0.0, 1.0, 0.2) #forward
         if command == 'b':
-            translate(0.0, -1.0, 0.0, 1.0, 0.25) #backwards
+            translate(0.0, -1.0, 0.0, 1.0, 0.2) #backwards
         if command == 'l':
-            translate(0.0, 0.0, -0.25, 0.75, 0.25) #rotate left
+            translate(0.0, 0.0, -0.25, 0.75, 0.2) #rotate left
         if command == 'r':
-            translate(0.0, 0.0, 0.25, 0.75, 0.25) #rotate right
+            translate(0.0, 0.0, 0.25, 0.75, 0.2) #rotate right
         if command == 'q':
-            translate(-1.0, 0.0, 0.0, 1.0, 0.25) #travel left
+            translate(-1.0, 0.0, 0.0, 1.0, 0.2) #travel left
         if command == 'e':
-            translate(1.0, 0.0, 0.0, 1.0, 0.25) #travel right
+            translate(1.0, 0.0, 0.0, 1.0, 0.2) #travel right
         if command == 'u':
             incrementCamServo(-0.2)
             time.sleep(0.02)
