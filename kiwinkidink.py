@@ -133,6 +133,11 @@ def translate(x, y, turn_angle, speed, delta_t):
         setKiwiMotors(x, y, yaw, speed)
     stopMotors()
 
+def setLedMode(mode):
+    buf = bytearray(1)
+    buf[0] = mode
+    i2c.writeto(address, buf, start = 0, end = len(buf), stop = True)
+
 def setup(robot_config):
     global cs
     global i2c
@@ -182,4 +187,20 @@ def move(args):
         if command == 'c':
             kit.motor1.throttle = 1.0
             time.sleep(0.05)
+        if command == 'off':
+            setLedMode(0)
+        if command == 'white':
+            setLedMode(1)
+        if command == 'red':
+            setLedMode(2)
+        if command == 'orange':
+            setLedMode(3)
+        if command == 'yellow':
+            setLedMode(4)
+        if command == 'green':
+            setLedMode(5)
+        if command == 'blue':
+            setLedMode(6)
+        if command == 'purple':
+            setLedMode(7)
         stopMotors()
