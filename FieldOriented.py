@@ -119,7 +119,15 @@ while 1:
         #print("output: {}".format(yaw))
         #print()
         kit.motor1.throttle = 0.0
+        print("roll")
+        print(type(roll))
+        print("pitch")
+        print(type(pitch))
+        print("yaw")
+        print(type(yaw))
         throttle_max = max([roll, pitch, yaw])
+        print("throttle_max")
+        print(type(throttle_max))
         print("throttle_max: {}".format(throttle_max))
         motor2_speed = 0.0
         motor3_speed = 0.0
@@ -135,10 +143,14 @@ while 1:
             motor3_speed = combine(roll, pitch, yaw, 5.0*pi/6.0 - heading + field_zero)
             motor4_speed = combine(roll, pitch, yaw, 3.0*pi/2.0 - heading + field_zero)
         motor_max = max([motor2_speed, motor3_speed, motor4_speed])
-        throttle_mult = throttle_max/motor_max
-        kit.motor2.throttle = constrain(throttle_mult*motor2_speed, -1.0, 1.0)
-        kit.motor3.throttle = constrain(throttle_mult*motor3_speed, -1.0, 1.0)
-        kit.motor4.throttle = constrain(throttle_mult*motor4_speed, -1.0, 1.0)
+        print("motor2_speed")
+        print(type(motor2_speed))
+        print("motor_max")
+        print(type(motor_max))
+        #throttle_mult = throttle_max/motor_max
+        #kit.motor2.throttle = constrain(throttle_mult*motor2_speed, -1.0, 1.0)
+        #kit.motor3.throttle = constrain(throttle_mult*motor3_speed, -1.0, 1.0)
+        #kit.motor4.throttle = constrain(throttle_mult*motor4_speed, -1.0, 1.0)
         prev_throttle = throttle
         prev_active = data[0]
     else:
