@@ -136,7 +136,7 @@ def translate(x, y, turn_angle, speed, delta_t):
 def setLedMode(mode):
     buf = bytearray(1)
     buf[0] = mode
-    i2c.writeto(address, buf, start = 0, end = len(buf), stop = True)
+    i2c.writeto(arduino_address, buf, start = 0, end = len(buf), stop = True)
 
 def setup(robot_config):
     global cs
