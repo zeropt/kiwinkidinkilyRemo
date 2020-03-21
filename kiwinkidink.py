@@ -164,9 +164,9 @@ def move(args):
     if RCConnected() == False:
     #if True:
         if command == 'f':
-            translate(0.0, 1.0, 0.0, 1.0, 0.2) #forward
+            translate(0.0, 1.0, 0.0, 1.0, 0.25) #forward
         if command == 'b':
-            translate(0.0, -1.0, 0.0, 1.0, 0.2) #backwards
+            translate(0.0, -1.0, 0.0, 1.0, 0.25) #backwards
         if command == 'l':
             translate(0.0, 0.0, -0.25, 1.0, 0.2) #rotate left
         if command == 'r':
