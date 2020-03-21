@@ -13,7 +13,6 @@ kit = None
 i2c = None
 sensor = None
 pid = None
-zeroheading = None
 
 camServoMin = 6.0
 camServoMax = 11.5
@@ -115,19 +114,22 @@ def translate(x_speed, y_speed, rotate_speed, speed, delta_t):
     pid.resetTime()
     while ((time.time() - prev_t) < delta_t):
         yaw = rotate_speed
-        pid.setSetpoint(zeroheading)
         in_angle = getGyroData()
         if in_angle == None:
             pid.resetTime()
         else:
             angle = in_angle*2*pi/370.0
-            if abs(zeroheading-(angle+2*pi)) < abs(zeroheading-angle):
+            if abs(pid.setpoint-(angle+2*pi)) < abs(pid.setpoint-angle):
                 angle += 2*pi
-            elif abs(zeroheading-(angle-2*pi)) < abs(zeroheading-angle):
+            elif abs(pid.setpoint-(angle-2*pi)) < abs(pid.setpoint-angle):
                 angle -= 2*pi
             pid.update(angle)
             yaw = -pid.getOutput()
-            zeroheading += constrain(rotate_speed, -1.0, 1.0)*(angle - zeroheading)
+            pid.setpoint += constrain(rotate_speed, -1.0, 1.0)*(angle - pid.setpoint)
+            if pid.setpoint > 2.0*pi:
+                pid.setpoint -= 2.0*pi
+            if pid.setpoint < 0.0:
+                pid.setpoint += 2.0*pi
         setKiwiMotors(x_speed, y_speed, yaw, speed)
     stopMotors()
 
@@ -140,7 +142,7 @@ def resetHeading():
     in_angle = getGyroData()
     while in_angle == None:
         in_angle = getGyroData()
-    zeroheading = in_angle*2*pi/370.0
+    pid.setSetpoint(in_angle*2*pi/370.0)
 
 def setup(robot_config):
     global cs
@@ -148,7 +150,6 @@ def setup(robot_config):
     global sensor
     global kit
     global pid
-    global zeroheading
     #global camServo
 
     kit = MotorKit()
@@ -159,7 +160,6 @@ def setup(robot_config):
     i2c = busio.I2C(board.SCL, board.SDA)
     sensor = adafruit_bno055.BNO055(i2c)
     pid = pid_controller(kP, kI, kD, 0.0)
-    zeroheading = 0.0
     resetHeading()
     stopMotors()
 
