@@ -210,4 +210,6 @@ def move(args):
             setLedMode(6)
         if command == 'purple':
             setLedMode(7)
+        if command == 'swerve':
+            exec(open("/home/pi/kiwinkidinkily/RC_swerve.py").read())
         stopMotors()
