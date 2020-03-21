@@ -3,6 +3,7 @@ from math import *
 import time
 import board
 import busio
+import os
 from adafruit_motorkit import MotorKit
 import RPi.GPIO as GPIO
 import adafruit_bno055
@@ -211,5 +212,5 @@ def move(args):
         if command == 'purple':
             setLedMode(7)
         if command == 'swerve':
-            exec(open("/home/pi/kiwinkidinkily/RC_swerve.py").read())
+            os.system("python3 /home/pi/kiwinkidinkilyRemo/RC_swerve.py")
         stopMotors()
