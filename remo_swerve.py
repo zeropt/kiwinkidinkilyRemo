@@ -140,6 +140,7 @@ while 1:
             setKiwiMotors(roll, pitch, yaw, field_zero-heading, throttle_max)
         prev_throttle = throttle
         prev_active = data[0]
+        timeout_counter = 0
     else:
         if prev_active > 0:
             kit.motor1.throttle = 0.0
@@ -147,9 +148,8 @@ while 1:
             kit.motor3.throttle = 0.0
             kit.motor4.throttle = 0.0
             prev_throttle = 0.0
-            timeout_counter = 0
             prev_active = 0
         timeout_counter += 1
-    if timeout_counter >= 10:
+    if timeout_counter > 200:
         break
     time.sleep(0.01)
