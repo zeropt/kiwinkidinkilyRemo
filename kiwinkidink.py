@@ -13,6 +13,7 @@ kit = None
 i2c = None
 sensor = None
 pid = None
+zeroheading = None
 
 camServoMin = 6.0
 camServoMax = 11.5
@@ -109,28 +110,25 @@ def setKiwiMotors(roll, pitch, yaw, scale):
     kit.motor3.throttle = constrain(throttle_mult*motor3_speed, -1.0, 1.0)
     kit.motor4.throttle = constrain(throttle_mult*motor4_speed, -1.0, 1.0)
 
-def translate(x, y, turn_angle, speed, delta_t):
+def translate(x_speed, y_speed, rotate_speed, speed, delta_t):
     prev_t = time.time()
-    pid.setSetpoint(turn_angle)
-    in_angle = getGyroData()
-    while in_angle == None:
-        in_angle = getGyroData()
-    field_zero = in_angle*2*pi/370.0
     pid.resetTime()
     while ((time.time() - prev_t) < delta_t):
-        yaw = 0.0
+        yaw = rotate_speed
+        pid.setSetpoint(zeroheading)
         in_angle = getGyroData()
         if in_angle == None:
             pid.resetTime()
         else:
-            angle = in_angle*2*pi/370.0 - field_zero
-            if abs(turn_angle-(angle+2*pi)) < abs(turn_angle-angle):
+            angle = in_angle*2*pi/370.0
+            if abs(zeroheading-(angle+2*pi)) < abs(zeroheading-angle):
                 angle += 2*pi
-            elif abs(turn_angle-(angle-2*pi)) < abs(turn_angle-angle):
+            elif abs(zeroheading-(angle-2*pi)) < abs(zeroheading-angle):
                 angle -= 2*pi
             pid.update(angle)
             yaw = -pid.getOutput()
-        setKiwiMotors(x, y, yaw, speed)
+            zeroheading += constrain(rotate_speed, -1.0, 1.0)*(angle - zeroheading)
+        setKiwiMotors(x_speed, y_speed, yaw, speed)
     stopMotors()
 
 def setLedMode(mode):
@@ -138,12 +136,19 @@ def setLedMode(mode):
     buf[0] = mode
     i2c.writeto(arduino_address, buf, start = 0, end = len(buf), stop = True)
 
+def resetHeading():
+    in_angle = getGyroData()
+    while in_angle == None:
+        in_angle = getGyroData()
+    zeroheading = in_angle*2*pi/370.0
+
 def setup(robot_config):
     global cs
     global i2c
     global sensor
     global kit
     global pid
+    global zeroheading
     #global camServo
 
     kit = MotorKit()
@@ -154,6 +159,8 @@ def setup(robot_config):
     i2c = busio.I2C(board.SCL, board.SDA)
     sensor = adafruit_bno055.BNO055(i2c)
     pid = pid_controller(kP, kI, kD, 0.0)
+    zeroheading = 0.0
+    resetHeading()
     stopMotors()
 
 def move(args):
@@ -168,9 +175,9 @@ def move(args):
         if command == 'b':
             translate(0.0, -1.0, 0.0, 1.0, 0.25) #backwards
         if command == 'l':
-            translate(0.0, 0.0, -0.25, 1.0, 0.2) #rotate left
+            translate(0.0, 0.0, -1.0, 1.0, 0.2) #rotate left
         if command == 'r':
-            translate(0.0, 0.0, 0.25, 1.0, 0.2) #rotate right
+            translate(0.0, 0.0, 1,0, 1.0, 0.2) #rotate right
         if command == 'q':
             translate(-1.0, 0.0, 0.0, 1.0, 0.2) #travel left
         if command == 'e':
