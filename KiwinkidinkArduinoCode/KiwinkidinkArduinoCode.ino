@@ -133,16 +133,16 @@ void updateLEDs() {
     colorWipe(strip.Color(255, 50, 0)); //Orange
     break;
     case 4:
-    colorWipe(strip.Color(255, 200, 0)); //yellow
+    colorWipe(strip.Color(100, 80, 0)); //yellow
     break;
     case 5:
-    colorWipe(strip.Color(0, 255, 0)); //green
+    colorWipe(strip.Color(0, 130, 0)); //green
     break;
     case 6:
-    colorWipe(strip.Color(0, 0, 255)); //blue
+    colorWipe(strip.Color(0, 0, 130)); //blue
     break;
     case 7:
-    colorWipe(strip.Color(255, 0, 255)); //purple
+    colorWipe(strip.Color(100, 0, 90)); //purple
     break;
   }
 }
