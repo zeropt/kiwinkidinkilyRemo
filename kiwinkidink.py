@@ -124,8 +124,8 @@ def translate(x_speed, y_speed, rotate_speed, speed, delta_t):
             elif abs(pid.setpoint-(angle-2*pi)) < abs(pid.setpoint-angle):
                 angle -= 2*pi
             pid.update(angle)
-            yaw = -pid.getOutput()
-            pid.setpoint += constrain(rotate_speed, -1.0, 1.0)*(angle - pid.setpoint)
+            yaw -= pid.getOutput()
+            pid.setpoint += abs(constrain(rotate_speed, -1.0, 1.0))*(angle - pid.setpoint)
             if pid.setpoint > 2.0*pi:
                 pid.setpoint -= 2.0*pi
             if pid.setpoint < 0.0:
@@ -175,9 +175,9 @@ def move(args):
         if command == 'b':
             translate(0.0, -1.0, 0.0, 1.0, 0.25) #backwards
         if command == 'l':
-            translate(0.0, 0.0, -1.0, 1.0, 0.2) #rotate left
+            translate(0.0, 0.0, 1.0, 1.0, 0.05) #rotate left
         if command == 'r':
-            translate(0.0, 0.0, 1,0, 1.0, 0.2) #rotate right
+            translate(0.0, 0.0, -1.0, 1.0, 0.05) #rotate right
         if command == 'q':
             translate(-1.0, 0.0, 0.0, 1.0, 0.2) #travel left
         if command == 'e':
