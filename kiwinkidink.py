@@ -163,6 +163,7 @@ def setup(robot_config):
     pid = pid_controller(kP, kI, kD, 0.0)
     resetHeading()
     stopMotors()
+    setLedMode(3) #set LEDs to orange
 
 def move(args):
     command=args['button']['command']
@@ -177,8 +178,10 @@ def move(args):
             translate(0.0, -1.0, 0.0, 1.0, 0.25) #backwards
         if command == 'l':
             translate(0.0, 0.0, 1.0, 1.0, 0.05) #rotate left
+            resetHeading()
         if command == 'r':
             translate(0.0, 0.0, -1.0, 1.0, 0.05) #rotate right
+            resetHeading()
         if command == 'q':
             translate(-1.0, 0.0, 0.0, 1.0, 0.2) #travel left
         if command == 'e':
