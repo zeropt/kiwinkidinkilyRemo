@@ -19,10 +19,12 @@ camServoMin = 6.0
 camServoMax = 11.5
 camServo = 8.0
 
+stationary = False
+
 arduino_address = 0x08
 
 #PID Coefficients
-kP = 1.5
+kP = 2.0
 kI = 0.0
 kD = 0.01
 
@@ -62,6 +64,8 @@ def stopMotors():
     kit.motor2.throttle = 0.0
     kit.motor3.throttle = 0.0
     kit.motor4.throttle = 0.0
+
+def stopServo():
     cs.ChangeDutyCycle(0.0)
 
 def incrementCamServo(amount):
@@ -166,26 +170,12 @@ def setup(robot_config):
     setLedMode(3) #set LEDs to orange
 
 def move(args):
+    global stationary
     command=args['button']['command']
 
     log.debug("move kiwinkidink command : %s", command)
 
-    #if RCConnected() == False:
     if True:
-        if command == 'f':
-            translate(0.0, 1.0, 0.0, 1.0, 0.25) #forward
-        if command == 'b':
-            translate(0.0, -1.0, 0.0, 1.0, 0.25) #backwards
-        if command == 'l':
-            translate(0.0, 0.0, 1.0, 1.0, 0.05) #rotate left
-            resetHeading()
-        if command == 'r':
-            translate(0.0, 0.0, -1.0, 1.0, 0.05) #rotate right
-            resetHeading()
-        if command == 'q':
-            translate(-1.0, 0.0, 0.0, 1.0, 0.2) #travel left
-        if command == 'e':
-            translate(1.0, 0.0, 0.0, 1.0, 0.2) #travel right
         if command == 'u':
             incrementCamServo(-0.2)
             time.sleep(0.02)
@@ -214,6 +204,27 @@ def move(args):
             setLedMode(6)
         if command == 'purple':
             setLedMode(7)
-        if command == 'swerve':
+        if command == 'rc':
             os.system("python3 /home/pi/kiwinkidinkilyRemo/remo_swerve.py &")
+        if command == 'stationary_on':
+            stationary = True
+        if command == 'stationary_off':
+            stationary = False
+    if RCConnected() == False:
+        if command == 'l':
+            translate(0.0, 0.0, 1.0, 1.0, 0.05) #rotate left
+            resetHeading()
+        if command == 'r':
+            translate(0.0, 0.0, -1.0, 1.0, 0.05) #rotate right
+            resetHeading()
+        if stationary == False:
+            if command == 'f':
+                translate(0.0, 1.0, 0.0, 1.0, 0.25) #forward
+            if command == 'b':
+                translate(0.0, -1.0, 0.0, 1.0, 0.25) #backwards
+            if command == 'q':
+                translate(-1.0, 0.0, 0.0, 1.0, 0.2) #travel left
+            if command == 'e':
+                translate(1.0, 0.0, 0.0, 1.0, 0.2) #travel right
         stopMotors()
+    stopServo()
