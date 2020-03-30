@@ -16,7 +16,7 @@ sensor = None
 pid = None
 
 camServoMin = 6.0
-camServoMax = 11.5
+camServoMax = 12.0
 camServo = 8.0
 
 stationary = False
@@ -167,6 +167,7 @@ def setup(robot_config):
     pid = pid_controller(kP, kI, kD, 0.0)
     resetHeading()
     stopMotors()
+    stopServo()
     setLedMode(3) #set LEDs to orange
 
 def move(args):
