@@ -215,5 +215,5 @@ def move(args):
         if command == 'purple':
             setLedMode(7)
         if command == 'swerve':
-            os.system("python3 /home/pi/kiwinkidinkilyRemo/remo_swerve.py")
+            os.system("python3 /home/pi/kiwinkidinkilyRemo/remo_swerve.py &")
         stopMotors()
